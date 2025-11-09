@@ -3,15 +3,16 @@ import mediapipe as mp
 import cv_util as util
 
 # Arguments
-detect_hands = False
-detect_pose = False
+detect_hands = True
+detect_pose = True
 detect_face = True
 
 draw = True
 
 # Initialize MediaPipe detections via the library
-if sum(detect_pose, detect_face, detect_hands) > 1:
-    detect_holistic = False
+if sum([detect_pose, detect_face, detect_hands]) > 1:
+    detect_holistic = True
+    holistic = util.init_holistic()
     print("Using Mediapipe Holistic detection (hands + pose + face).")
 elif detect_hands:
     hands = util.init_hands()
@@ -42,7 +43,7 @@ while True:
     img = cv2.flip(img, 1)
 
     if detect_holistic:
-        pass
+        holistic_landmarks = util.process_holistic(img, holistic, draw)
     elif detect_hands:
         hand_landmarks = util.process_hands(img, hands, draw)
     elif detect_pose:
