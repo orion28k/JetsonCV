@@ -1,19 +1,12 @@
 
 import cv2
-import mediapipe as mp
+import cv_util
 
 draw_hands = True
 hand_effect = False
 
 # Initialize MediaPipe Hands via the library
-mp_hands = mp.solutions.hands
-hands = mp_hands.Hands(
-    static_image_mode=False,
-    max_num_hands=2,
-    model_complexity=1,
-    min_detection_confidence=0.5,
-    min_tracking_confidence=0.5,
-)
+hands = cv_util.init_hands()
 
 # Capture default cameras
 cap = cv2.VideoCapture(1)
