@@ -1,7 +1,7 @@
 import mediapipe as mp
 import cv2
 
-# ---------- MediaPipe Hands setup ----------
+# ---------- MediaPipe Hands ----------
 
 def init_hands():
     """
@@ -59,3 +59,18 @@ def draw_hands(img, multi_hand_landmarks):
             mp_drawing.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=3), # customize landmarks
             mp_drawing.DrawingSpec(color=(0, 0, 255), thickness=2) # customize lines
         )
+
+def init_pose():
+    mp_pose = mp.solutions.pose
+
+    pose = mp_pose.Pose(
+        static_image_mode=False,
+        model_complexity=1,
+        smooth_landmarks=True,
+        enable_segmentation=False,
+        smooth_segmentation=True,
+        min_detection_confidence=0.5,
+        min_tracking_confidence=0.5
+    )
+
+    return pose

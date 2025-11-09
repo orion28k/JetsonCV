@@ -8,6 +8,9 @@ hand_effect = False
 # Initialize MediaPipe Hands via the library
 hands = util.init_hands()
 
+# Initialize MediaPipe Body Pose via the library
+pose = util.init_pose()
+
 # Capture default cameras
 cap = cv2.VideoCapture(1)
 if not cap.isOpened():
