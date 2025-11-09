@@ -26,7 +26,7 @@ def process_hands(img, hands, draw = False,hands_array = [None, None]):
     - Draw hands?
 
     Return
-    - Hand array [index 0 left hand or index 1 right hand][landmark]
+    - Hand array [index 0 left hand or index 1 right hand][landmark] or None
     - If draw, draw 
     '''
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -60,7 +60,13 @@ def draw_hands(img, multi_hand_landmarks):
             mp_drawing.DrawingSpec(color=(0, 0, 255), thickness=2) # customize lines
         )
 
+# ---------- MediaPipe Body Pose ----------
+
 def init_pose():
+    """
+    Initialize and return a MediaPipe Body Pose instance.
+    main.py calls this once and reuses the object.
+    """
     mp_pose = mp.solutions.pose
 
     pose = mp_pose.Pose(
@@ -74,3 +80,40 @@ def init_pose():
     )
 
     return pose
+
+def process_pose(img, pose, draw=False):
+    '''
+    Args
+    - Image (BGR)
+    - MediaPipe Pose object
+    - Draw pose?
+
+    Return
+    - pose_landmarks (NormalizedLandmarkList) or None
+    '''
+    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    results = pose.process(img_rgb)
+
+    if results.pose_landmarks:
+        if draw:
+            draw_pose(img, results.pose_landmarks)
+            
+        return results.pose_landmarks
+
+    return None
+
+
+def draw_pose(img, pose_landmarks):
+    """
+    Draw the full body pose landmarks and connections onto the image.
+    """
+    mp_drawing = mp.solutions.drawing_utils
+    mp_pose = mp.solutions.pose
+
+    mp_drawing.draw_landmarks(
+        img,
+        pose_landmarks,
+        mp_pose.POSE_CONNECTIONS,
+        mp_drawing.DrawingSpec(color=(0, 255, 255), thickness=2, circle_radius=3),
+        mp_drawing.DrawingSpec(color=(255, 0, 255), thickness=2),
+    )

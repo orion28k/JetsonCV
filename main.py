@@ -28,6 +28,7 @@ while True:
     img = cv2.flip(img, 1)
 
     hand_landmarks = util.process_hands(img, hands, draw=True)
+    pose_landmarks = util.process_pose(img, pose, draw=True)
 
     cv2.imshow("Window", img)
     key = cv2.waitKey(1)
