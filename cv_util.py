@@ -180,4 +180,56 @@ def process_holistic(img, holistic, draw=False):
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     results = holistic.process(img_rgb)
 
+    if draw:
+        draw_holistic(img, results)
+
     return results
+
+
+def draw_holistic(img, results):
+    """Draw pose + hand + face landmarks from a Holistic results object.
+
+    This mirrors draw_hands/draw_pose, but uses the unified Holistic API.
+    """
+    mp_drawing = mp.solutions.drawing_utils
+    mp_holistic = mp.solutions.holistic
+
+    # Draw body pose
+    if results.pose_landmarks:
+        mp_drawing.draw_landmarks(
+            img,
+            results.pose_landmarks,
+            mp_holistic.POSE_CONNECTIONS,
+            mp_drawing.DrawingSpec(color=(0, 255, 255), thickness=2, circle_radius=3),
+            mp_drawing.DrawingSpec(color=(255, 0, 255), thickness=2),
+        )
+
+    # Draw left hand
+    if results.left_hand_landmarks:
+        mp_drawing.draw_landmarks(
+            img,
+            results.left_hand_landmarks,
+            mp_holistic.HAND_CONNECTIONS,
+            mp_drawing.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=3),
+            mp_drawing.DrawingSpec(color=(0, 0, 255), thickness=2),
+        )
+
+    # Draw right hand
+    if results.right_hand_landmarks:
+        mp_drawing.draw_landmarks(
+            img,
+            results.right_hand_landmarks,
+            mp_holistic.HAND_CONNECTIONS,
+            mp_drawing.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=3),
+            mp_drawing.DrawingSpec(color=(0, 0, 255), thickness=2),
+        )
+
+    # Draw face landmarks (contours only, to keep it simple)
+    if results.face_landmarks:
+        mp_drawing.draw_landmarks(
+            img,
+            results.face_landmarks,
+            mp_holistic.FACEMESH_CONTOURS,
+            mp_drawing.DrawingSpec(color=(0, 255, 255), thickness=1, circle_radius=1),
+            mp_drawing.DrawingSpec(color=(255, 255, 0), thickness=1),
+        )
