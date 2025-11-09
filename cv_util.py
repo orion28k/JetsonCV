@@ -117,6 +117,8 @@ def draw_pose(img, pose_landmarks):
         mp_drawing.DrawingSpec(color=(255, 0, 255), thickness=2),
     )
 
+# ---------- MediaPipe Simple Facial Feature ----------
+
 def init_face():
     """Initialize a lightweight MediaPipe Face Detection model."""
     mp_face_detection = mp.solutions.face_detection
