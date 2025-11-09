@@ -31,6 +31,7 @@ def process_hands(img, hands, draw = False,hands_array = [None, None]):
     '''
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     results = hands.process(img_rgb)
+    hands_array = [None, None]
 
     if results.multi_hand_landmarks and results.multi_handedness:
         for hand_landmarks, handedness in zip(results.multi_hand_landmarks, results.multi_handedness):
@@ -43,8 +44,6 @@ def process_hands(img, hands, draw = False,hands_array = [None, None]):
                 hands_array[0] = hand_landmarks
             elif label == "right":
                 hands_array[1] = hand_landmarks
-    else:
-        return None
 
     return hands_array
 
@@ -225,8 +224,10 @@ def process_holistic(img, holistic, draw=False):
 
     if draw:
         draw_holistic(img, results)
-
-    return results
+    if results:
+        return results
+    else:
+        return None
 
 
 def draw_holistic(img, results):

@@ -1,10 +1,11 @@
 import cv2
 import mediapipe as mp
 import cv_util as util
+import hand
 
 # Arguments (Configurable)
-detection_mode = "none"  # one of: "none", "hands", "pose", "face", "holistic"
-draw = True
+detection_mode = "hands"  # one of: "none", "hands", "pose", "face", "holistic"
+draw = False
 
 # Initialize detection mode
 if detection_mode == "holistic":
@@ -39,13 +40,22 @@ while True:
     # Flip for mirror effect
     img = cv2.flip(img, 1)
 
-    # Get data for detected target
+    # Holistic Data
     if detection_mode == "holistic":
         holistic_landmarks = util.process_holistic(img, holistic, draw)
+
+    # Hand Data
     elif detection_mode == "hands":
         hand_landmarks = util.process_hands(img, hands, draw)
+
+        if hand_landmarks:
+            hand.draw_effect(img, hand_landmarks)
+
+    # Body Pose Data
     elif detection_mode == "pose":
         pose_landmarks = util.process_pose(img, pose, draw)
+
+    # Facial Feature Data
     elif detection_mode == "face":
         face_landmarks = util.process_face(img, face, draw)
 
