@@ -141,3 +141,8 @@ def process_face(img, face_detection, draw=False):
                 mp_drawing.draw_detection(img, detection)
         return results.detections
     return None
+
+# ---------- MediaPipe Holistic ----------
+
+def init_holistic():
+    pass
