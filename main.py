@@ -4,10 +4,9 @@ import cv_util as util
 
 # Arguments (Configurable)
 detection_mode = "none"  # one of: "none", "hands", "pose", "face", "holistic"
-
 draw = True
 
-
+# Initialize detection mode
 if detection_mode == "holistic":
     # Multiple detections requested -> use Holistic
     holistic = util.init_holistic()
@@ -40,6 +39,7 @@ while True:
     # Flip for mirror effect
     img = cv2.flip(img, 1)
 
+    # Get data for detected target
     if detection_mode == "holistic":
         holistic_landmarks = util.process_holistic(img, holistic, draw)
     elif detection_mode == "hands":
