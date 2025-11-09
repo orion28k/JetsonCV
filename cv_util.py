@@ -161,3 +161,23 @@ def init_holistic():
         min_tracking_confidence=0.5
     )
     return holistic
+
+def process_holistic(img, holistic, draw=False):
+    """Run MediaPipe Holistic on the frame and optionally draw results.
+
+    Args:
+        img: BGR image (numpy array).
+        holistic: A MediaPipe Holistic instance created by init_holistic().
+        draw: If True, draw pose + hand (and optionally face) landmarks.
+
+    Returns:
+        results: The MediaPipe Holistic results object, which exposes:
+            - results.pose_landmarks
+            - results.left_hand_landmarks
+            - results.right_hand_landmarks
+            - results.face_landmarks
+    """
+    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    results = holistic.process(img_rgb)
+
+    return results
