@@ -102,7 +102,6 @@ def process_pose(img, pose, draw=False):
 
     return None
 
-
 def draw_pose(img, pose_landmarks):
     """
     Draw the full body pose landmarks and connections onto the image.
@@ -117,3 +116,21 @@ def draw_pose(img, pose_landmarks):
         mp_drawing.DrawingSpec(color=(0, 255, 255), thickness=2, circle_radius=3),
         mp_drawing.DrawingSpec(color=(255, 0, 255), thickness=2),
     )
+
+def init_face():
+    """Initialize a lightweight MediaPipe Face Detection model."""
+    mp_face_detection = mp.solutions.face_detection
+    face_detection = mp_face_detection.FaceDetection(
+        model_selection=0,             # 0: short-range, 1: full-range
+        min_detection_confidence=0.5
+    )
+    return face_detection
+
+def process_face(img, face_detection, draw=False):
+    """Process the image for face features"""
+    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    results = face_detection.process(img_rgb)
+
+    if results.detections:
+        return results.detections
+    return None
