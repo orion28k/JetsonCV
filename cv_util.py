@@ -127,10 +127,15 @@ def init_face():
     return face_detection
 
 def process_face(img, face_detection, draw=False):
-    """Process the image for face features"""
+    """Process the image and optionally draw face bounding boxes."""
+    mp_drawing = mp.solutions.drawing_utils
+
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     results = face_detection.process(img_rgb)
 
     if results.detections:
+        for detection in results.detections:
+            if draw:
+                mp_drawing.draw_detection(img, detection)
         return results.detections
     return None
