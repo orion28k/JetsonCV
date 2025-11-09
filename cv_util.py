@@ -117,30 +117,73 @@ def draw_pose(img, pose_landmarks):
         mp_drawing.DrawingSpec(color=(255, 0, 255), thickness=2),
     )
 
-# ---------- MediaPipe Simple Facial Feature ----------
+
+# ---------- MediaPipe Face Mesh (Full Facial Landmarks) ----------
 
 def init_face():
-    """Initialize a lightweight MediaPipe Face Detection model."""
-    mp_face_detection = mp.solutions.face_detection
-    face_detection = mp_face_detection.FaceDetection(
-        model_selection=0,             # 0: short-range, 1: full-range
-        min_detection_confidence=0.5
+    """
+    Initialize and return a MediaPipe Face Mesh instance.
+    main.py calls this once and reuses the object.
+    """
+    mp_face_mesh = mp.solutions.face_mesh
+
+    face_mesh = mp_face_mesh.FaceMesh(
+        static_image_mode=False,
+        max_num_faces=1,
+        refine_landmarks=True,  # includes iris landmarks
+        min_detection_confidence=0.5,
+        min_tracking_confidence=0.5,
     )
-    return face_detection
 
-def process_face(img, face_detection, draw=False):
-    """Process the image and optionally draw face bounding boxes."""
-    mp_drawing = mp.solutions.drawing_utils
+    return face_mesh
 
+def process_face(img, face_mesh, draw=False):
+    """
+    Run MediaPipe Face Mesh on the given frame and optionally draw the mesh.
+
+    Args:
+        img: BGR image (numpy array).
+        face_mesh: A MediaPipe FaceMesh instance created by init_face().
+        draw: If True, draw the face mesh on the image.
+
+    Returns:
+        multi_face_landmarks: list of NormalizedLandmarkList (one per face), or None.
+    """
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    results = face_detection.process(img_rgb)
+    results = face_mesh.process(img_rgb)
 
-    if results.detections:
-        for detection in results.detections:
-            if draw:
-                mp_drawing.draw_detection(img, detection)
-        return results.detections
+    if results.multi_face_landmarks:
+        if draw:
+            draw_face(img, results.multi_face_landmarks)
+        return results.multi_face_landmarks
+
     return None
+
+def draw_face(img, multi_face_landmarks):
+    """
+    Draw face mesh landmarks and connections onto the image.
+    """
+    mp_drawing = mp.solutions.drawing_utils
+    mp_styles = mp.solutions.drawing_styles
+    mp_face_mesh = mp.solutions.face_mesh
+
+    for face_landmarks in multi_face_landmarks:
+        # Tesselation (dense mesh)
+        mp_drawing.draw_landmarks(
+            image=img,
+            landmark_list=face_landmarks,
+            connections=mp_face_mesh.FACEMESH_TESSELATION,
+            landmark_drawing_spec=None,
+            connection_drawing_spec=mp_styles.get_default_face_mesh_tesselation_style(),
+        )
+        # Contours (eyes, lips, face outline)
+        mp_drawing.draw_landmarks(
+            image=img,
+            landmark_list=face_landmarks,
+            connections=mp_face_mesh.FACEMESH_CONTOURS,
+            landmark_drawing_spec=None,
+            connection_drawing_spec=mp_styles.get_default_face_mesh_contours_style(),
+        )
 
 # ---------- MediaPipe Holistic ----------
 

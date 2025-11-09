@@ -2,14 +2,15 @@ import cv2
 import mediapipe as mp
 import cv_util as util
 
-# Arguments
-detect_hands = True
-detect_pose = True
+# Arguments (Configurable)
+detect_hands = False
+detect_pose = False
 detect_face = True
 
 draw = True
 
 # Initialize MediaPipe detections via the library
+detect_holistic = False
 if sum([detect_pose, detect_face, detect_hands]) > 1:
     detect_holistic = True
     holistic = util.init_holistic()
