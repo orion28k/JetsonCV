@@ -3,29 +3,26 @@ import mediapipe as mp
 import cv_util as util
 
 # Arguments (Configurable)
-detect_hands = False
-detect_pose = False
-detect_face = True
+detection_mode = "none"  # one of: "none", "hands", "pose", "face", "holistic"
 
 draw = True
 
-# Initialize MediaPipe detections via the library
-detect_holistic = False
-if sum([detect_pose, detect_face, detect_hands]) > 1:
-    detect_holistic = True
+
+if detection_mode == "holistic":
+    # Multiple detections requested -> use Holistic
     holistic = util.init_holistic()
-    print("Using Mediapipe Holistic detection (hands + pose + face).")
-elif detect_hands:
+    print("[INFO]: Using Mediapipe Holistic detection (hands + pose + face).")
+elif detection_mode == "hands":
     hands = util.init_hands()
-    print("Using Mediapipe Hand detection.")
-elif detect_pose:
+    print("[INFO]: Using Mediapipe Hand detection.")
+elif detection_mode == "pose":
     pose = util.init_pose()
-    print("Using Mediapipe Body Pose detection.")
-elif detect_face:
+    print("[INFO]: Using Mediapipe Body Pose detection.")
+elif detection_mode == "face":
     face = util.init_face()
-    print("Using Mediapipe Facial Feature detection.")
+    print("[INFO]: Using Mediapipe Facial Feature detection.")
 else:
-    print("Not using Mediapipe detection")
+    print("[INFO]: Not using Mediapipe detection")
 
 # Capture default cameras
 cap = cv2.VideoCapture(1)
@@ -43,13 +40,13 @@ while True:
     # Flip for mirror effect
     img = cv2.flip(img, 1)
 
-    if detect_holistic:
+    if detection_mode == "holistic":
         holistic_landmarks = util.process_holistic(img, holistic, draw)
-    elif detect_hands:
+    elif detection_mode == "hands":
         hand_landmarks = util.process_hands(img, hands, draw)
-    elif detect_pose:
+    elif detection_mode == "pose":
         pose_landmarks = util.process_pose(img, pose, draw)
-    elif detect_face:
+    elif detection_mode == "face":
         face_landmarks = util.process_face(img, face, draw)
 
     cv2.imshow("Window", img)
