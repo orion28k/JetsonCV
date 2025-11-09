@@ -2,11 +2,23 @@ import cv2
 import mediapipe as mp
 import cv_util as util
 
-draw_hands = True
-hand_effect = False
+# Arguments
+detect_hands = False
+detect_pose = False
+detect_holistic = True
 
-# Initialize MediaPipe Hands via the library
-hands = util.init_hands()
+# Initialize MediaPipe detections via the library
+if detect_hands and detect_pose:
+    pass
+    print("Using Mediapipe Holistic detection.")
+elif detect_hands:
+    hands = util.init_hands()
+    print("Using Mediapipe Hand detection.")
+elif detect_pose:
+    pose = util.init_pose()
+    print("Using Mediapipe Body Pose detection.")
+else:
+    print("Not using Mediapipe detection")
 
 # Capture default cameras
 cap = cv2.VideoCapture(1)
@@ -24,7 +36,11 @@ while True:
     # Flip for mirror effect
     img = cv2.flip(img, 1)
 
-    hand_landmarks = util.process_hands(img, hands, draw=True)
+    if detect_hands:
+        hand_landmarks = util.process_hands(img, hands, draw=True)
+    
+    if detect_pose:
+        pose_landmarks = util.process_pose(img, pose, draw=True)
 
     cv2.imshow("Window", img)
     key = cv2.waitKey(1)
