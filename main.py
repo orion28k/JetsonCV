@@ -1,4 +1,3 @@
-
 import cv2
 import mediapipe as mp
 import cv_util as util
@@ -25,21 +24,7 @@ while True:
     # Flip for mirror effect
     img = cv2.flip(img, 1)
 
-    if draw_hands:
-        mp_drawing = mp.solutions.drawing_utils
-
-        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        results = hands.process(img_rgb)
-
-        if results.multi_hand_landmarks:
-            for hand_landmarks in results.multi_hand_landmarks:
-                mp_drawing.draw_landmarks(
-                    img, # image
-                    hand_landmarks, # hand landmarks
-                    mp.solutions.hands.HAND_CONNECTIONS, # list of index pairs that define the connections
-                    mp_drawing.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=3), # customize landmarks
-                    mp_drawing.DrawingSpec(color=(0, 0, 255), thickness=2) # customize lines
-                )
+    util.process_hands(img, hands, draw=True)
 
     cv2.imshow("Window", img)
     key = cv2.waitKey(1)

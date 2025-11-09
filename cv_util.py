@@ -1,4 +1,5 @@
 import mediapipe as mp
+import cv2
 
 # ---------- MediaPipe Hands setup ----------
 
@@ -16,3 +17,45 @@ def init_hands():
         min_tracking_confidence=0.5,
     )
     return hands
+
+def process_hands(img, hands, draw = False,hands_array = [None, None]):
+    '''
+    Args
+    - Image
+    - Medipipe Hands object
+    - Draw hands?
+
+    Return
+    - Hand array [index 0 left hand or index 1 right hand][landmark]
+    - If draw, draw 
+    '''
+    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    results = hands.process(img_rgb)
+
+    if results.multi_hand_landmarks and results.multi_handedness:
+        for hand_landmarks, handedness in zip(results.multi_hand_landmarks, results.multi_handedness):
+            if draw:
+                draw_hands(img, results.multi_hand_landmarks)
+
+            label = handedness.classification[0].label.lower()  # "left" or "right"
+
+            if label == "left":
+                hands_array[0] = hand_landmarks
+            elif label == "right":
+                hands_array[1] = hand_landmarks
+    else:
+        return None
+
+    return hands_array
+
+def draw_hands(img, multi_hand_landmarks):
+    mp_drawing = mp.solutions.drawing_utils
+
+    for hand_landmarks in multi_hand_landmarks:
+        mp_drawing.draw_landmarks(
+            img, # image
+            hand_landmarks, # hand landmarks
+            mp.solutions.hands.HAND_CONNECTIONS, # list of index pairs that define the connections
+            mp_drawing.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=3), # customize landmarks
+            mp_drawing.DrawingSpec(color=(0, 0, 255), thickness=2) # customize lines
+        )
