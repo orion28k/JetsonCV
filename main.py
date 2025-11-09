@@ -24,7 +24,7 @@ while True:
     # Flip for mirror effect
     img = cv2.flip(img, 1)
 
-    util.process_hands(img, hands, draw=True)
+    hand_landmarks = util.process_hands(img, hands, draw=True)
 
     cv2.imshow("Window", img)
     key = cv2.waitKey(1)
