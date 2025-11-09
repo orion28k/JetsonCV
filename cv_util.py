@@ -145,4 +145,19 @@ def process_face(img, face_detection, draw=False):
 # ---------- MediaPipe Holistic ----------
 
 def init_holistic():
-    pass
+    """
+    Initialize and return a MediaPipe Holistic instance.
+    This detects pose, hands, and face landmarks simultaneously.
+    """
+    mp_holistic = mp.solutions.holistic
+    holistic = mp_holistic.Holistic(
+        static_image_mode=False,
+        model_complexity=1,
+        smooth_landmarks=True,
+        enable_segmentation=False,
+        smooth_segmentation=True,
+        refine_face_landmarks=True,
+        min_detection_confidence=0.5,
+        min_tracking_confidence=0.5
+    )
+    return holistic
