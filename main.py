@@ -6,13 +6,12 @@ import cv_util as util
 detect_hands = False
 detect_pose = False
 detect_face = True
-detect_holistic = False
 
 draw = True
 
 # Initialize MediaPipe detections via the library
-if detect_hands and detect_pose and detect_face:
-    pass
+if sum(detect_pose, detect_face, detect_hands) > 1:
+    detect_holistic = False
     print("Using Mediapipe Holistic detection (hands + pose + face).")
 elif detect_hands:
     hands = util.init_hands()
@@ -22,7 +21,7 @@ elif detect_pose:
     print("Using Mediapipe Body Pose detection.")
 elif detect_face:
     face = util.init_face()
-    print("Using Mediapipe Body Pose detection.")
+    print("Using Mediapipe Facial Feature detection.")
 else:
     print("Not using Mediapipe detection")
 
