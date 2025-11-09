@@ -141,3 +141,95 @@ def process_face(img, face_detection, draw=False):
                 mp_drawing.draw_detection(img, detection)
         return results.detections
     return None
+
+# ---------- MediaPipe Holistic ----------
+
+def init_holistic():
+    """
+    Initialize and return a MediaPipe Holistic instance.
+    This detects pose, hands, and face landmarks simultaneously.
+    """
+    mp_holistic = mp.solutions.holistic
+    holistic = mp_holistic.Holistic(
+        static_image_mode=False,
+        model_complexity=1,
+        smooth_landmarks=True,
+        enable_segmentation=False,
+        smooth_segmentation=True,
+        refine_face_landmarks=True,
+        min_detection_confidence=0.5,
+        min_tracking_confidence=0.5
+    )
+    return holistic
+
+def process_holistic(img, holistic, draw=False):
+    """Run MediaPipe Holistic on the frame and optionally draw results.
+
+    Args:
+        img: BGR image (numpy array).
+        holistic: A MediaPipe Holistic instance created by init_holistic().
+        draw: If True, draw pose + hand (and optionally face) landmarks.
+
+    Returns:
+        results: The MediaPipe Holistic results object, which exposes:
+            - results.pose_landmarks
+            - results.left_hand_landmarks
+            - results.right_hand_landmarks
+            - results.face_landmarks
+    """
+    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    results = holistic.process(img_rgb)
+
+    if draw:
+        draw_holistic(img, results)
+
+    return results
+
+
+def draw_holistic(img, results):
+    """Draw pose + hand + face landmarks from a Holistic results object.
+
+    This mirrors draw_hands/draw_pose, but uses the unified Holistic API.
+    """
+    mp_drawing = mp.solutions.drawing_utils
+    mp_holistic = mp.solutions.holistic
+
+    # Draw body pose
+    if results.pose_landmarks:
+        mp_drawing.draw_landmarks(
+            img,
+            results.pose_landmarks,
+            mp_holistic.POSE_CONNECTIONS,
+            mp_drawing.DrawingSpec(color=(0, 255, 255), thickness=2, circle_radius=3),
+            mp_drawing.DrawingSpec(color=(255, 0, 255), thickness=2),
+        )
+
+    # Draw left hand
+    if results.left_hand_landmarks:
+        mp_drawing.draw_landmarks(
+            img,
+            results.left_hand_landmarks,
+            mp_holistic.HAND_CONNECTIONS,
+            mp_drawing.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=3),
+            mp_drawing.DrawingSpec(color=(0, 0, 255), thickness=2),
+        )
+
+    # Draw right hand
+    if results.right_hand_landmarks:
+        mp_drawing.draw_landmarks(
+            img,
+            results.right_hand_landmarks,
+            mp_holistic.HAND_CONNECTIONS,
+            mp_drawing.DrawingSpec(color=(0, 255, 0), thickness=2, circle_radius=3),
+            mp_drawing.DrawingSpec(color=(0, 0, 255), thickness=2),
+        )
+
+    # Draw face landmarks (contours only, to keep it simple)
+    if results.face_landmarks:
+        mp_drawing.draw_landmarks(
+            img,
+            results.face_landmarks,
+            mp_holistic.FACEMESH_CONTOURS,
+            mp_drawing.DrawingSpec(color=(0, 255, 255), thickness=1, circle_radius=1),
+            mp_drawing.DrawingSpec(color=(255, 255, 0), thickness=1),
+        )
