@@ -2,7 +2,7 @@ import math
 import cv2
 
 
-def draw_effect(img, hand_landmarks):
+def hand_to_cursor(img, hand_landmarks):
     """
     Draw a red line between landmark 8 and landmark 4 for each hand, and if the
     distance between those two landmarks is small enough (interpreted as the
@@ -17,6 +17,8 @@ def draw_effect(img, hand_landmarks):
     """
     if hand_landmarks is None:
         return
+    
+    touching = False
 
     h, w = img.shape[:2]
 
@@ -51,8 +53,13 @@ def draw_effect(img, hand_landmarks):
         dy = y8 - y4
         dist = math.hypot(dx, dy)
 
-        # Determine color: green if touching, red otherwise
         if dist <= touch_threshold:
+            touching = True
+        else:
+            touching = False
+
+        # Determine color: green if touching, red otherwise
+        if touching:
             color = (0, 255, 0)  # Green
         else:
             color = (0, 0, 255)  # Red
@@ -68,7 +75,7 @@ def draw_effect(img, hand_landmarks):
         )
 
         # If the distance is small enough, draw a large circle at midpoint
-        if dist <= touch_threshold:
+        if touching:
             cx = int((x8 + x4) * 0.5)
             cy = int((y8 + y4) * 0.5)
 

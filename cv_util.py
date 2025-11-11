@@ -231,9 +231,13 @@ def process_holistic(img, holistic, draw=False):
 
 
 def draw_holistic(img, results):
-    """Draw pose + hand + face landmarks from a Holistic results object.
+    """
+    Draw all available Holistic landmarks onto the provided image.
 
-    This mirrors draw_hands/draw_pose, but uses the unified Holistic API.
+    Args:
+        img: BGR image (numpy array) that will be drawn on in-place.
+        results: MediaPipe Holistic results from process_holistic(), containing pose,
+            left/right hand, and face landmarks (each may be None).
     """
     mp_drawing = mp.solutions.drawing_utils
     mp_holistic = mp.solutions.holistic
