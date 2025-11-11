@@ -1,11 +1,27 @@
 import cv2
 import mediapipe as mp
 import cv_util as util
-import hand
+from hand import HTC
 
 # Arguments (Configurable)
 detection_mode = "hands"  # one of: "none", "hands", "pose", "face", "holistic"
 draw = False
+
+# Create Objects
+
+## Capture default cameras
+cap = cv2.VideoCapture(1)
+if not cap.isOpened():
+    cap.release()
+    cap = cv2.VideoCapture(0)
+    if not cap.isOpened():
+        raise RuntimeError("Unable to access a webcam on indices 1 or 0.")
+    
+## Determine screen size for cursor mapping
+screen_size = util.get_screen_size()
+
+## Create Hand-to-Cursor Object
+htc = HTC(screen_size)
 
 # Initialize detection mode
 if detection_mode == "holistic":
@@ -24,13 +40,6 @@ elif detection_mode == "face":
 else:
     print("[INFO]: Not using Mediapipe detection")
 
-# Capture default cameras
-cap = cv2.VideoCapture(1)
-if not cap.isOpened():
-    cap.release()
-    cap = cv2.VideoCapture(0)
-    if not cap.isOpened():
-        raise RuntimeError("Unable to access a webcam on indices 1 or 0.")
 
 while True:
     success, img = cap.read()
