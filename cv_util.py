@@ -1,6 +1,33 @@
 import mediapipe as mp
 import cv2
 
+try:
+    import tkinter as tk
+except Exception:  # pragma: no cover - tkinter not always available
+    tk = None
+
+def get_screen_size(default=(1920, 1080)):
+    """
+    Determine the primary screen resolution.
+
+    Args:
+        default: Tuple[int, int] fallback resolution if tkinter is unavailable.
+
+    Returns:
+        Tuple[int, int]: Width and height of the primary display.
+    """
+    if tk is None:
+        return default
+
+    root = tk.Tk()
+    root.withdraw()
+    try:
+        width = root.winfo_screenwidth()
+        height = root.winfo_screenheight()
+    finally:
+        root.destroy()
+    return width, height
+
 # ---------- MediaPipe Hands ----------
 
 def init_hands():
