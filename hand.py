@@ -6,6 +6,7 @@ class HTC:
     def __init__(self, screen_size=(1920, 1080)):
         self.mouse = pynput.mouse.Controller()
         self.touching = False
+        self.clicked = False
         self._set_screen_size(screen_size)
 
     def hand_to_cursor(self, img, hand_landmarks):
@@ -65,6 +66,7 @@ class HTC:
                 self.touching = True
             else:
                 self.touching = False
+                self.clicked = False
 
             if self.touching:
                 color = (0, 255, 0)  # Line color green
@@ -85,9 +87,9 @@ class HTC:
                 # Use the right hand (index 1) to steer the mouse cursor.
                 self.landmark_to_mouse_pos((cx, cy), (h, w))
 
-            # If the distance is small enough, draw a large circle at midpoint
+            # If the distance is small enough,
             if self.touching:
-                # Large circle radius relative to image size
+                # Draw a large circle at midpoint relative to image size
                 radius = int(0.1 * min(w, h))
 
                 cv2.circle(
@@ -98,6 +100,12 @@ class HTC:
                     3,
                     cv2.LINE_AA,
                 )
+
+                if not self.clicked:
+                    # Send a single left-click when fingertips meet
+                    self.mouse.click(pynput.mouse.Button.left, 1)
+                    self.clicked = True
+
 
     def landmark_to_mouse_pos(self, landmark_pt, frame_size):
         """
