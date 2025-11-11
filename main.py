@@ -58,7 +58,7 @@ while True:
         hand_landmarks = util.process_hands(img, hands, draw)
 
         if hand_landmarks:
-            hand.draw_effect(img, hand_landmarks)
+            htc.hand_to_cursor(img, hand_landmarks)
 
     # Body Pose Data
     elif detection_mode == "pose":
