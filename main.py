@@ -21,7 +21,7 @@ if not cap.isOpened():
 screen_size = util.get_screen_size()
 
 ## Create Hand-to-Cursor Object
-htc = HTC(screen_size)
+htc = HTC()
 
 # Initialize detection mode
 if detection_mode == "holistic":
