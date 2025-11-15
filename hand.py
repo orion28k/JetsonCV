@@ -4,7 +4,7 @@ import pynput
 import pyautogui
 
 class HTC:
-    def __init__(self, cursor_smooth=0.3):
+    def __init__(self, cursor_smooth=0.3, scale = 1.75):
         """
         Args:
             screen_size:     Fallback screen size if auto-detection fails.
@@ -16,6 +16,7 @@ class HTC:
         """
         self.mouse = pynput.mouse.Controller()
         self.screen_size = pyautogui.size()
+        self.scale = scale
         self.touching = False
         self.clicked = False
 
@@ -37,10 +38,8 @@ class HTC:
         screen_point1 = (0, 0)
         screen_point2 = (screen_w, screen_h)
 
-        scale = 2
-
         # Compute bounds box points
-        bounds = self.scale_bounds_to_screen((bounds[0], bounds[1]), (screen_point1,screen_point2), scale=1/scale)
+        bounds = self.scale_bounds_to_screen((bounds[0], bounds[1]), (screen_point1,screen_point2), scale=1/self.scale)
 
         # Create bouding box visual
         cv2.rectangle(img, bounds[0], bounds[1], (0, 255, 0))
