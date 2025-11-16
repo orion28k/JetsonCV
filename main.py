@@ -1,7 +1,7 @@
 import cv2
 import mediapipe as mp
 import cv_util as util
-from hand import HTC
+from htc import HTC
 
 # Arguments (Configurable)
 detection_mode = "hands"  # one of: "none", "hands", "pose", "face", "holistic"
