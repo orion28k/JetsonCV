@@ -308,3 +308,21 @@ def draw_holistic(img, results):
             mp_drawing.DrawingSpec(color=(0, 255, 255), thickness=1, circle_radius=1),
             mp_drawing.DrawingSpec(color=(255, 255, 0), thickness=1),
         )
+
+def init_detection_obj(mode):
+    if mode == "holistic":
+        # Multiple detections requested -> use Holistic
+        print("[INFO]: Using Mediapipe Holistic detection (hands + pose + face).")
+        return init_holistic()
+    elif mode == "hands":
+        print("[INFO]: Using Mediapipe Hand detection.")
+        return init_hands()
+    elif mode == "pose":
+        print("[INFO]: Using Mediapipe Body Pose detection.")
+        return init_pose()
+    elif mode == "face":
+        print("[INFO]: Using Mediapipe Facial Feature detection.")
+        return init_face()
+    else:
+        print("[INFO]: Not using Mediapipe detection")
+        return

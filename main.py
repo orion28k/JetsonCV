@@ -24,22 +24,7 @@ screen_size = util.get_screen_size()
 htc = HTC(cursor_smooth=0.3, scale = 1.75)
 
 # Initialize detection mode
-if detection_mode == "holistic":
-    # Multiple detections requested -> use Holistic
-    holistic = util.init_holistic()
-    print("[INFO]: Using Mediapipe Holistic detection (hands + pose + face).")
-elif detection_mode == "hands":
-    hands = util.init_hands()
-    print("[INFO]: Using Mediapipe Hand detection.")
-elif detection_mode == "pose":
-    pose = util.init_pose()
-    print("[INFO]: Using Mediapipe Body Pose detection.")
-elif detection_mode == "face":
-    face = util.init_face()
-    print("[INFO]: Using Mediapipe Facial Feature detection.")
-else:
-    print("[INFO]: Not using Mediapipe detection")
-
+obj = util.init_detection_obj(detection_mode)
 
 while True:
     success, img = cap.read()
@@ -51,24 +36,30 @@ while True:
 
     # Holistic Data
     if detection_mode == "holistic":
-        holistic_landmarks = util.process_holistic(img, holistic, draw)
+        holistic_landmarks = util.process_holistic(img, obj, draw)
 
     # Hand Data
     elif detection_mode == "hands":
-        hand_landmarks = util.process_hands(img, hands, draw)
+        hand_landmarks = util.process_hands(img, obj, draw)
 
         if hand_landmarks:
             htc.hand_to_cursor(img, hand_landmarks)
 
     # Body Pose Data
     elif detection_mode == "pose":
-        pose_landmarks = util.process_pose(img, pose, draw)
+        pose_landmarks = util.process_pose(img, obj, draw)
 
     # Facial Feature Data
     elif detection_mode == "face":
-        face_landmarks = util.process_face(img, face, draw)
+        face_landmarks = util.process_face(img, obj, draw)
 
-    cv2.imshow("Window", img)
+    x = 0.1
+    if x > 1.0:
+        img_resize = cv2.resize(img, (0,0), fx=x, fy=x, interpolation=cv2.INTER_AREA)
+    else:
+        img_resize = cv2.resize(img, (0,0), fx=x, fy=x, interpolation=cv2.INTER_AREA)
+
+    cv2.imshow("Window", img_resize)
     key = cv2.waitKey(1)
 
     if key == 27:  # ESC to exit
