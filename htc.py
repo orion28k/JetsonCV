@@ -125,7 +125,7 @@ class HTC:
                     cv2.LINE_AA,
                 )
 
-            if idx == 0:
+            if idx == 1:
                 # Use this hand to steer the mouse cursor.
                 # Map the point inside the green bounds box to full screen coordinates.
 
