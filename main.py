@@ -10,7 +10,7 @@ draw = False
 # Create Objects
 
 ## Capture default cameras
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 if not cap.isOpened():
     cap.release()
     cap = cv2.VideoCapture(0)
@@ -53,7 +53,7 @@ while True:
     elif detection_mode == "face":
         face_landmarks = util.process_face(img, obj, draw)
 
-    x = 0.1
+    x = 1
     if x > 1.0:
         img_resize = cv2.resize(img, (0,0), fx=x, fy=x, interpolation=cv2.INTER_AREA)
     else:

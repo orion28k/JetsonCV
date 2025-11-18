@@ -325,4 +325,4 @@ def init_detection_obj(mode):
         return init_face()
     else:
         print("[INFO]: Not using Mediapipe detection")
-        return
+        return None
