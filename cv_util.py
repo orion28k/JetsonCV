@@ -29,7 +29,6 @@ def get_screen_size(default=(1920, 1080)):
     return width, height
 
 # ---------- MediaPipe Hands ----------
-
 def init_hands():
     """
     Initialize and return a MediaPipe Hands instance.
