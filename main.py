@@ -5,7 +5,9 @@ from htc import HTC
 
 # Arguments (Configurable)
 detection_mode = "hands"  # one of: "none", "hands", "pose", "face", "holistic"
-draw = False
+draw = True
+
+hand_to_cursor = False
 
 # Create Objects
 
@@ -13,7 +15,7 @@ draw = False
 cap = cv2.VideoCapture(0)
 if not cap.isOpened():
     cap.release()
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
     if not cap.isOpened():
         raise RuntimeError("Unable to access a webcam on indices 1 or 0.")
     
@@ -21,7 +23,10 @@ if not cap.isOpened():
 screen_size = util.get_screen_size()
 
 ## Create Hand-to-Cursor Object
-htc = HTC(cursor_smooth=0.3, scale = 1.75)
+if hand_to_cursor and detection_mode == "hands":
+    htc = HTC(cursor_smooth=0.3, scale = 1.75)
+else:
+    htc = None
 
 # Initialize detection mode
 obj = util.init_detection_obj(detection_mode)
@@ -42,7 +47,7 @@ while True:
     elif detection_mode == "hands":
         hand_landmarks = util.process_hands(img, obj, draw)
 
-        if hand_landmarks:
+        if hand_to_cursor and hand_landmarks:
             htc.hand_to_cursor(img, hand_landmarks)
 
     # Body Pose Data
