@@ -25,19 +25,15 @@ class DroneController:
         self.img = self.frame_read
 
     def control(self):
-        while True:
-            self.cTime = time.time()
-            fps = 1 / (self.cTime - self.pTime) if self.cTime != self.pTime else 0
-            self.pTime = self.cTime
+        self.cTime = time.time()
+        fps = 1 / (self.cTime - self.pTime) if self.cTime != self.pTime else 0
+        self.pTime = self.cTime
 
-            #---------------------------------------------------
-            pose = self.controller.get_pose()
-            self.framer(self.frame_read.frame, fps = fps)
+        #---------------------------------------------------
+        pose = self.controller.get_pose()
+        self.framer(self.frame_read.frame, fps = fps)
 
-            # ---------------------------------------------------
-
-            if self.timeout == 150:
-                break
+        # ---------------------------------------------------
 
     def end(self):
         self.controller.streamoff()

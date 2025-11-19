@@ -6,7 +6,7 @@ from DroneController import main as dronert
 
 
 # Arguments (Configurable)
-detection_mode = "hands"  # one of: "none", "hands", "pose", "face", "holistic"
+detection_mode = "holistic"  # one of: "none", "hands", "pose", "face", "holistic"
 draw = True
 
 hand_to_cursor = False
@@ -25,13 +25,15 @@ obj = util.init_detection_obj(detection_mode)
 drone = dronert.DroneController()
 
 while True:
-    # ------------------------------ Replace with drone img
-    if drone.img is None:
+    # Grab the latest frame from the drone video stream
+    frame = drone.frame_read.frame
+
+    if frame is None:
         print("none")
         continue
 
     # Flip for mirror effect
-    img = cv2.flip(drone.img, 1)
+    img = cv2.flip(frame, 1)
     # -----------------------------------------------------
 
     # Holistic Data
