@@ -2,6 +2,8 @@ import cv2
 import mediapipe as mp
 import cv_util as util
 from htc import HTC
+from DroneController import main as dronert
+
 
 # Arguments (Configurable)
 detection_mode = "hands"  # one of: "none", "hands", "pose", "face", "holistic"
@@ -10,34 +12,27 @@ draw = True
 hand_to_cursor = False
 
 # Create Objects
-
-## Capture default cameras
-cap = cv2.VideoCapture(0)
-if not cap.isOpened():
-    cap.release()
-    cap = cv2.VideoCapture(1)
-    if not cap.isOpened():
-        raise RuntimeError("Unable to access a webcam on indices 1 or 0.")
-    
-## Determine screen size for cursor mapping
+## Determine screen size
 screen_size = util.get_screen_size()
-
 ## Create Hand-to-Cursor Object
 if hand_to_cursor and detection_mode == "hands":
     htc = HTC(cursor_smooth=0.3, scale = 1.75)
 else:
     htc = None
-
-# Initialize detection mode
+## Initialize detection mode
 obj = util.init_detection_obj(detection_mode)
+## Create drone controller
+drone = dronert.DroneController()
 
 while True:
-    success, img = cap.read()
-    if not success or img is None:
+    # ------------------------------ Replace with drone img
+    if drone.img is None:
+        print("none")
         continue
 
     # Flip for mirror effect
-    img = cv2.flip(img, 1)
+    img = cv2.flip(drone.img, 1)
+    # -----------------------------------------------------
 
     # Holistic Data
     if detection_mode == "holistic":
@@ -46,9 +41,6 @@ while True:
     # Hand Data
     elif detection_mode == "hands":
         hand_landmarks = util.process_hands(img, obj, draw)
-
-        if hand_to_cursor and hand_landmarks:
-            htc.hand_to_cursor(img, hand_landmarks)
 
     # Body Pose Data
     elif detection_mode == "pose":
@@ -70,5 +62,5 @@ while True:
     if key == 27:  # ESC to exit
         break
 
-cap.release()
+drone.end()
 cv2.destroyAllWindows()

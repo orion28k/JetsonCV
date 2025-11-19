@@ -3,7 +3,7 @@ import mediapipe as mp
 import time
 import camera
 
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 
 
 timeout = 0
@@ -11,6 +11,8 @@ pTime = 0
 cTime = 0
 
 cv2.namedWindow("Image", cv2.WINDOW_NORMAL)
+
+# set_home, move_by, get_pose
 
 while True:
     success, img = cap.read()
