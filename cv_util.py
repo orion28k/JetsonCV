@@ -33,7 +33,7 @@ def get_screen_size(default=(1920, 1080)):
 def init_hands():
     """
     Initialize and return a MediaPipe Hands instance.
-    main.py calls this once and reuses the object.
+    controller.py calls this once and reuses the object.
     """
     mp_hands = mp.solutions.hands
     hands = mp_hands.Hands(
@@ -91,7 +91,7 @@ def draw_hands(img, multi_hand_landmarks):
 def init_pose():
     """
     Initialize and return a MediaPipe Body Pose instance.
-    main.py calls this once and reuses the object.
+    controller.py calls this once and reuses the object.
     """
     mp_pose = mp.solutions.pose
 
@@ -149,7 +149,7 @@ def draw_pose(img, pose_landmarks):
 def init_face():
     """
     Initialize and return a MediaPipe Face Mesh instance.
-    main.py calls this once and reuses the object.
+    controller.py calls this once and reuses the object.
     """
     mp_face_mesh = mp.solutions.face_mesh
 

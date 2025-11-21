@@ -2,19 +2,16 @@ import cv2
 import mediapipe as mp
 import cv_util as util
 from htc import HTC
-from DroneController import main as dronert
+from DroneController import controller
 
 
 # Arguments (Configurable)
-detection_mode = "holistic"  # one of: "none", "hands", "pose", "face", "holistic"
-draw = True
+detection_mode = "none"  # one of: "none", "hands", "pose", "face", "holistic"
+draw = False
 
 hand_to_cursor = False
 
 # Create Objects
-## Determine screen size
-screen_size = util.get_screen_size()
-## Create Hand-to-Cursor Object
 if hand_to_cursor and detection_mode == "hands":
     htc = HTC(cursor_smooth=0.3, scale = 1.75)
 else:
@@ -22,19 +19,20 @@ else:
 ## Initialize detection mode
 obj = util.init_detection_obj(detection_mode)
 ## Create drone controller
-drone = dronert.DroneController()
+drone = controller.DroneController()
 
 while True:
     # Grab the latest frame from the drone video stream
     frame = drone.frame_read.frame
-
     if frame is None:
         print("none")
         continue
-
-    # Flip for mirror effect
     img = cv2.flip(frame, 1)
-    # -----------------------------------------------------
+
+    y,x = img.shape[:2]
+    cv2.line(img, (int(x/2),0), (int(x/2),y), color=(0,255,0)) #pt1[x,y], pt2[x,y]
+
+    # if landmark is less than x/2: print "left"
 
     # Holistic Data
     if detection_mode == "holistic":
