@@ -6,8 +6,8 @@ from DroneController import controller
 
 
 # Arguments (Configurable)
-detection_mode = "none"  # one of: "none", "hands", "pose", "face", "holistic"
-draw = False
+detection_mode = "holistic"  # one of: "none", "hands", "pose", "face", "holistic"
+draw = True
 
 hand_to_cursor = False
 
@@ -37,6 +37,10 @@ while True:
     # Holistic Data
     if detection_mode == "holistic":
         holistic_landmarks = util.process_holistic(img, obj, draw)
+
+        if holistic_landmarks:
+            for x in holistic_landmarks.pose_landmarks
+        print(holistic_landmarks.pose_landmarks[11], holistic_landmarks.pose_landmarks[12], holistic_landmarks.pose_landmarks[23], holistic_landmarks.pose_landmarks[24])
 
     # Hand Data
     elif detection_mode == "hands":
