@@ -38,19 +38,12 @@ while True:
     if detection_mode == "holistic":
         holistic_landmarks = util.process_holistic(img, obj, draw)
 
-        if holistic_landmarks and holistic_landmarks.pose_landmarks:
-            pose_landmarks = holistic_landmarks.pose_landmarks.landmark
-            target_ids = (11, 12, 23, 24)
-            coords = []
-            for landmark_id in target_ids:
-                lm = pose_landmarks[landmark_id]
-                coords.append(
-                    (landmark_id, int(lm.x * x), int(lm.y * y))
-                )
-            coord_msg = ", ".join(
-                f"id {landmark_id}: ({px}, {py})" for landmark_id, px, py in coords
-            )
-            print(f"Pose landmarks -> {coord_msg}")
+        if holistic_landmarks.pose_landmarks:
+            rawlm1, rawlm12, rawlm23, rawlm24 = holistic_landmarks.pose_landmarks.landmark[11], holistic_landmarks.pose_landmarks.landmark[12], holistic_landmarks.pose_landmarks.landmark[23],holistic_landmarks.pose_landmarks.landmark[24]
+        
+            print(rawlm1, rawlm12, rawlm23, rawlm24)
+
+
 
     # Hand Data
     elif detection_mode == "hands":
