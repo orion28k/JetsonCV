@@ -1,54 +1,69 @@
+import threading
 import cv2
-import mediapipe as mp
+from queue import Queue
 import cv_util as util
 from htc import HTC
+from DroneController import controller
+
 
 # Arguments (Configurable)
-detection_mode = "hands"  # one of: "none", "hands", "pose", "face", "holistic"
+detection_mode = "holistic"  # one of: "none", "hands", "pose", "face", "holistic"
 draw = True
 
 hand_to_cursor = False
 
 # Create Objects
-
-## Capture default cameras
-cap = cv2.VideoCapture(0)
-if not cap.isOpened():
-    cap.release()
-    cap = cv2.VideoCapture(1)
-    if not cap.isOpened():
-        raise RuntimeError("Unable to access a webcam on indices 1 or 0.")
-    
-## Determine screen size for cursor mapping
-screen_size = util.get_screen_size()
-
-## Create Hand-to-Cursor Object
 if hand_to_cursor and detection_mode == "hands":
     htc = HTC(cursor_smooth=0.3, scale = 1.75)
 else:
     htc = None
-
-# Initialize detection mode
+## Initialize detection mode
 obj = util.init_detection_obj(detection_mode)
+## Create drone controller
+drone = controller.DroneController()
+
+
+# Drone Start commands
+drone.controller.takeoff()
+threading.Thread(target=drone.rc_worker, daemon=True).start()
+ty = False
 
 while True:
-    success, img = cap.read()
-    if not success or img is None:
+    # Grab the latest frame from the drone video stream
+    frame = drone.frame_read.frame
+
+    # -------------------------------------------- FRAMER
+    if frame is None:
+        print("none")
         continue
 
-    # Flip for mirror effect
-    img = cv2.flip(img, 1)
+    img = cv2.flip(frame, 1)
+
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+    y,x = img.shape[:2]
+
+    # ----------------------------------------------------------------------
+    cv2.line(img, (int(x/2),0), (int(x/2),y), color=(0,255,0)) #pt1[x,y], pt2[x,y]
 
     # Holistic Data
     if detection_mode == "holistic":
         holistic_landmarks = util.process_holistic(img, obj, draw)
 
+        if holistic_landmarks.pose_landmarks:
+            center = util.compute_centerpoint(img, holistic_landmarks.pose_landmarks, draw = True)
+
+            if center[0] > x/2 and not ty:
+                ty = True
+                drone.command_q.put((0, 0, 0, -60))
+                print("left")
+            else:
+                print("right")
+
+
     # Hand Data
     elif detection_mode == "hands":
         hand_landmarks = util.process_hands(img, obj, draw)
-
-        if hand_to_cursor and hand_landmarks:
-            htc.hand_to_cursor(img, hand_landmarks)
 
     # Body Pose Data
     elif detection_mode == "pose":
@@ -64,11 +79,14 @@ while True:
     else:
         img_resize = cv2.resize(img, (0,0), fx=x, fy=x, interpolation=cv2.INTER_AREA)
 
+
+
     cv2.imshow("Window", img_resize)
     key = cv2.waitKey(1)
 
     if key == 27:  # ESC to exit
+        drone.togglepropellors()
         break
 
-cap.release()
+drone.end()
 cv2.destroyAllWindows()
