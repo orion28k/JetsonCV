@@ -27,14 +27,17 @@ class DroneController:
     def togglepropellors(self):
         if not self.flying:
             self.controller.takeoff()
+            time.sleep(3)
             self.flying = False
         else:
             self.controller.land()
+            time.sleep(5)
             self.flying = True
 
     def move(self, velocity = (0,0,0), yaw = 0):
         if self.flying:
             self.controller.send_rc_control(velocity[0],velocity[1],velocity[2],yaw)
+            time.sleep(5)
         else:
             print("Drone not flying")
 
