@@ -1,5 +1,7 @@
 import cv2
 import mediapipe as mp
+from mediapipe.tasks.python.benchmark.benchmark_utils import average
+
 import cv_util as util
 from htc import HTC
 from DroneController import controller
@@ -24,25 +26,32 @@ drone = controller.DroneController()
 while True:
     # Grab the latest frame from the drone video stream
     frame = drone.frame_read.frame
+
+    # -------------------------------------------- FRAMER
     if frame is None:
         print("none")
         continue
+
     img = cv2.flip(frame, 1)
 
-    y,x = img.shape[:2]
-    cv2.line(img, (int(x/2),0), (int(x/2),y), color=(0,255,0)) #pt1[x,y], pt2[x,y]
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
-    # if landmark is less than x/2: print "left"
+    y,x = img.shape[:2]
+
+    # ----------------------------------------------------------------------
+    cv2.line(img, (int(x/2),0), (int(x/2),y), color=(0,255,0)) #pt1[x,y], pt2[x,y]
 
     # Holistic Data
     if detection_mode == "holistic":
         holistic_landmarks = util.process_holistic(img, obj, draw)
 
         if holistic_landmarks.pose_landmarks:
-            rawlm1, rawlm12, rawlm23, rawlm24 = holistic_landmarks.pose_landmarks.landmark[11], holistic_landmarks.pose_landmarks.landmark[12], holistic_landmarks.pose_landmarks.landmark[23],holistic_landmarks.pose_landmarks.landmark[24]
-        
-            print(rawlm1, rawlm12, rawlm23, rawlm24)
+            center = util.compute_centerpoint(img, holistic_landmarks.pose_landmarks, draw = True)
 
+            if center[0] > x/2:
+                print("left")
+            else:
+                print("right")
 
 
     # Hand Data
@@ -62,6 +71,8 @@ while True:
         img_resize = cv2.resize(img, (0,0), fx=x, fy=x, interpolation=cv2.INTER_AREA)
     else:
         img_resize = cv2.resize(img, (0,0), fx=x, fy=x, interpolation=cv2.INTER_AREA)
+
+
 
     cv2.imshow("Window", img_resize)
     key = cv2.waitKey(1)

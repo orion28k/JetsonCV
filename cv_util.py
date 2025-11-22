@@ -326,3 +326,27 @@ def init_detection_obj(mode):
     else:
         print("[INFO]: Not using Mediapipe detection")
         return None
+
+# ---------- Holistic Util ----------
+
+def compute_centerpoint(img, pose_landmarks, draw = False):
+    y, x = img.shape[:2]
+    rawlm1, rawlm12, rawlm23, rawlm24 = pose_landmarks.landmark[11], pose_landmarks.landmark[12], pose_landmarks.landmark[23], pose_landmarks.landmark[24]
+    points = [rawlm1, rawlm12, rawlm23, rawlm24]
+    center = (0, 0)
+    index = 0
+    for lm in points:
+        if lm is None:
+            continue
+
+        lmx, lmy = lm.x * img.sizex, lm.y * y
+
+        center = (center[0] + lmx, center[1] + lmy)
+        index += 1
+
+    center = (int(center[0] / index), int(center[1] / index))
+
+    if draw:
+        cv2.circle(img, center, 3, color=(0, 255, 0))
+
+    return center
