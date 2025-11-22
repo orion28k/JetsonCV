@@ -1,3 +1,5 @@
+import time
+
 import cv2
 import mediapipe as mp
 from mediapipe.tasks.python.benchmark.benchmark_utils import average
@@ -22,6 +24,15 @@ else:
 obj = util.init_detection_obj(detection_mode)
 ## Create drone controller
 drone = controller.DroneController()
+
+# Drone Start commands
+drone.togglepropellors()
+drone.move((0,0,0), 100)
+time.sleep(3)
+drone.move((0,0,0), 0)
+drone.controller.land()
+
+
 
 while True:
     # Grab the latest frame from the drone video stream

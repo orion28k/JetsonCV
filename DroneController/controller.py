@@ -18,40 +18,27 @@ class DroneController:
             self.controller.end()
             raise SystemExit(1)
 
-        self.executed = False
+        self.flying = False
         self.timeout = 0
         self.pTime = 0
         self.cTime = 0
         self.img = self.frame_read
 
-    def control(self):
-        self.cTime = time.time()
-        fps = 1 / (self.cTime - self.pTime) if self.cTime != self.pTime else 0
-        self.pTime = self.cTime
+    def togglepropellors(self):
+        if not self.flying:
+            self.controller.takeoff()
+            self.flying = False
+        else:
+            self.controller.land()
+            self.flying = True
 
-        #---------------------------------------------------
-        pose = self.controller.get_pose()
-        self.framer(self.frame_read.frame, fps = fps)
-
-        # ---------------------------------------------------
+    def move(self, velocity = (0,0,0), yaw = 0):
+        if self.flying:
+            self.controller.send_rc_control(velocity[0],velocity[1],velocity[2],yaw)
+        else:
+            print("Drone not flying")
 
     def end(self):
         self.controller.streamoff()
         self.controller.end()
 
-    def framer(self, img, res=None, fps=None):
-        """
-        Optimizes window edits
-        :return: image of current frame in loop
-        """
-
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
-        if res:
-            img = cv2.resize(img, res)
-
-
-        if fps:
-            cv2.putText(img, f"FPS: {int(fps)}", (2, 40), cv2.FONT_HERSHEY_PLAIN, 1, (255, 0, 255), 1)
-
-        self.img = img
