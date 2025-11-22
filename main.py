@@ -1,9 +1,6 @@
-import time
 import threading
 import cv2
-import mediapipe as mp
-from mediapipe.tasks.python.benchmark.benchmark_utils import average
-
+from queue import Queue
 import cv_util as util
 from htc import HTC
 from DroneController import controller
@@ -25,9 +22,10 @@ obj = util.init_detection_obj(detection_mode)
 ## Create drone controller
 drone = controller.DroneController()
 
+
 # Drone Start commands
-thread1 = threading.Thread(target=drone.togglepropellors(), args=(), daemon=True)
-thread1.start()
+drone.controller.takeoff()
+threading.Thread(target=drone.rc_worker(), daemon=True).start()
 
 while True:
     # Grab the latest frame from the drone video stream
@@ -55,8 +53,7 @@ while True:
             center = util.compute_centerpoint(img, holistic_landmarks.pose_landmarks, draw = True)
 
             if center[0] > x/2:
-                thread2 = threading.Thread(target=drone.move(), args=((0,0,0), 100), daemon=True)
-                thread2.start
+                command_q.put((0, 0, 0, 60))
                 print("left")
             else:
                 print("right")

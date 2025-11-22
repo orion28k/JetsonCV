@@ -1,4 +1,5 @@
 import time
+from queue import Queue
 import cv2
 from DroneController.coordinate_tello import CoordinateTello
 
@@ -17,22 +18,16 @@ class DroneController:
             print(f"Video stream unavailable: {exc}")
             self.controller.end()
             raise SystemExit(1)
-
-        self.flying = False
-        self.timeout = 0
-        self.pTime = 0
-        self.cTime = 0
-        self.img = self.frame_read
+        
+        self.command_q = Queue()
 
     def togglepropellors(self):
-        if not self.flying:
+        if not self.controller.is_flying:
             self.controller.takeoff()
             time.sleep(3)
-            self.flying = False
         else:
             self.controller.land()
             time.sleep(5)
-            self.flying = True
 
     def move(self, velocity = (0,0,0), yaw = 0):
         if self.flying:
@@ -44,4 +39,10 @@ class DroneController:
     def end(self):
         self.controller.streamoff()
         self.controller.end()
+
+    def rc_worker(self):
+        while True:
+            vx, vy, vz, yaw = self.command_q.get()
+            self.controller.send_rc_control(vx, vy, vz, yaw)
+            self.command_q.task_done()
 
