@@ -25,7 +25,8 @@ drone = controller.DroneController()
 
 # Drone Start commands
 drone.controller.takeoff()
-threading.Thread(target=drone.rc_worker(), daemon=True).start()
+threading.Thread(target=drone.rc_worker, daemon=True).start()
+ty = False
 
 while True:
     # Grab the latest frame from the drone video stream
@@ -52,8 +53,9 @@ while True:
         if holistic_landmarks.pose_landmarks:
             center = util.compute_centerpoint(img, holistic_landmarks.pose_landmarks, draw = True)
 
-            if center[0] > x/2:
-                command_q.put((0, 0, 0, 60))
+            if center[0] > x/2 and not ty:
+                ty = True
+                drone.command_q.put((0, 0, 0, -60))
                 print("left")
             else:
                 print("right")

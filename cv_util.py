@@ -339,7 +339,7 @@ def compute_centerpoint(img, pose_landmarks, draw = False):
         if lm is None:
             continue
 
-        lmx, lmy = lm.x * img.sizex, lm.y * y
+        lmx, lmy = lm.x * x, lm.y * y
 
         center = (center[0] + lmx, center[1] + lmy)
         index += 1
