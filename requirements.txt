@@ -1,4 +1,13 @@
+
+# Project dependencies (one per line)
+numpy
+opencv-python
+mediapipe
+tensorflow
+mtcnn
+imutils
+djitellopy
+pygame
 pyautogui
 pynput
-mediapipe
-opencv-python
+matplotlib
