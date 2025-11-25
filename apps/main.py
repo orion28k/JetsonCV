@@ -4,8 +4,13 @@ This app uses the SDK core modules and runs a simple loop that displays the
 Tello frames and runs BasicCV. Advanced modules are optional and will be
 used only if available.
 """
+import sys
+import os
 import time
 import cv2
+
+# Ensure jetsoncv module can be imported from project root
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from jetsoncv.sdk.core.video_input import TelloVideoInput
 from jetsoncv.sdk.core.frame_hub import FrameHub

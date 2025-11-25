@@ -46,9 +46,10 @@ class TelloVideoInput:
         try:
             self._tello.streamon()
             self._started = True
-        except Exception:
+        except Exception as e:
             # Some environments do not support streaming; propagate a controlled error
             self._started = False
+            raise RuntimeError(f"Stream start failed: {e}")
 
     def stop_stream(self):
         if self._tello is not None:

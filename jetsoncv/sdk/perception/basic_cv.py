@@ -32,6 +32,11 @@ class BasicCV:
             self._prev_gray = gray
             return out
 
+        # Handle frame size mismatch (e.g., if resolution changes)
+        if gray.shape != self._prev_gray.shape:
+            self._prev_gray = gray
+            return out
+
         # compute frame difference and a simple motion magnitude metric
         diff = cv2.absdiff(gray, self._prev_gray)
         mag = float(np.mean(diff))
