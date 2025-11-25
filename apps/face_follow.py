@@ -102,18 +102,22 @@ def run_face_follow():
                 except Exception:
                     pass
 
-            # Draw detections
-            draw_detections(frame, detections)
+            # Build the image that the detector actually saw and display that
+            model_input = face_detector.preprocess(frame)  # grayscale image
+            display_frame = cv2.cvtColor(model_input, cv2.COLOR_GRAY2BGR)
 
-            # Draw status overlay
-            h, w = frame.shape[:2]
+            # Draw detections on the detector input image
+            draw_detections(display_frame, detections)
+
+            # Draw status overlay on the display frame
+            h, w = display_frame.shape[:2]
             status = "FLYING" if flying else "GROUNDED"
-            cv2.putText(frame, f"Status: {status} | Mode: {planner.mode}", (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
-            cv2.putText(frame, f"Faces: {len(detections)} | Motion: {bc_out.motion_magnitude:.1f}", (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
+            cv2.putText(display_frame, f"Status: {status} | Mode: {planner.mode}", (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+            cv2.putText(display_frame, f"Faces: {len(detections)} | Motion: {bc_out.motion_magnitude:.1f}", (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
             if video.read_state() and video.read_state().get("battery"):
-                cv2.putText(frame, f"Battery: {video.read_state()['battery']}%", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
+                cv2.putText(display_frame, f"Battery: {video.read_state()['battery']}%", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
 
-            cv2.imshow("Face Follow Demo", frame)
+            cv2.imshow("Face Follow Demo", display_frame)
 
             key = cv2.waitKey(1) & 0xFF
             if key == 27 or key == ord("q"):

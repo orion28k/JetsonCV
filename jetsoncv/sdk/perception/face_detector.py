@@ -44,3 +44,15 @@ class HaarFaceDetector:
             detections.append(Detection(bbox=bbox, label="face", confidence=0.9))
 
         return detections
+
+    def preprocess(self, frame) -> np.ndarray:
+        """Return the image as the model sees it (grayscale, histogram-equalized).
+
+        Useful for displaying the exact input fed to the Haar cascade.
+        """
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        try:
+            gray = cv2.equalizeHist(gray)
+        except Exception:
+            pass
+        return gray

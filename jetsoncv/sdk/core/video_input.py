@@ -73,9 +73,14 @@ class TelloVideoInput:
         if self._tello is None:
             return None
         try:
-            # djitellopy exposes basic telemetry via .get_battery(), but more
-            # advanced state may be available depending on version.
-            return {"battery": self._tello.get_battery()}
+            # Get battery and check if drone is flying
+            state = {"battery": self._tello.get_battery()}
+            # djitellopy tracks flight state; check if available
+            if hasattr(self._tello, "is_flying"):
+                state["flying"] = self._tello.is_flying
+            elif hasattr(self._tello, "_is_flying"):
+                state["flying"] = self._tello._is_flying
+            return state
         except Exception:
             return None
 
