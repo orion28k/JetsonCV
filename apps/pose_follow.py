@@ -8,6 +8,8 @@ Controls:
   [L] Land
   [F] Toggle FOLLOW_TARGET / HOVER mode
   [ESC/q] Quit
+  [-] Lower Max Yaw Speed
+  [=] Increase Max Yaw Speed
 """
 import sys
 import os
@@ -174,6 +176,7 @@ def run_pose_follow():
             cv2.putText(display_frame, f"{pose_str} | Motion: {bc_out.motion_magnitude:.1f}", (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
             if video.read_state() and video.read_state().get("battery"):
                 cv2.putText(display_frame, f"Battery: {video.read_state()['battery']}%", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)
+            cv2.putText(display_frame, f"yaw_max: {pose_controller.yaw_max}", (10, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1) 
 
             # Draw dead zone boundaries (vertical lines)
             try:
@@ -226,6 +229,10 @@ def run_pose_follow():
                         video._tello.send_rc_control(0, 0, 0, 0)
                     except Exception:
                         pass
+            elif key == ord("-"):
+                pose_controller.yaw_max = pose_controller.yaw_max - 1
+            elif key == ord("="):
+                pose_controller.yaw_max = pose_controller.yaw_max + 1
     finally:
         logger.info("Shutting down pose follow demo")
         cv2.destroyAllWindows()

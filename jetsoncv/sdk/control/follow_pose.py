@@ -21,7 +21,7 @@ class PoseFollowController:
         frame_width: int = 360,
         frame_height: int = 240,
         target_height_ratio: float = 0.2,  # target person height as % of frame
-        zone_width_ratio: float = 0.2,  # width of dead zone (center) as ratio of half-frame
+        zone_width_ratio: float = 0.1,  # width of dead zone (center) as ratio of half-frame
     ):
         self.frame_width = frame_width
         self.frame_height = frame_height
@@ -35,7 +35,7 @@ class PoseFollowController:
 
         # Yaw control gains for zone-based system
         # Yaw limits and dynamic scaling
-        self.yaw_max = 30  # maximum yaw command magnitude
+        self.yaw_max = 60  # maximum yaw command magnitude
 
         # PID gains for vertical control only
         self.pid_vz = [0.3, 0.3, 0.0]
