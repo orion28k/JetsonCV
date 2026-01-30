@@ -1,0 +1,157 @@
+================================================================================
+                        MASt3R-SLAM SETUP INSTRUCTIONS
+================================================================================
+
+Repository: https://github.com/rmurai0610/MASt3R-SLAM
+
+================================================================================
+HARDWARE REQUIREMENTS
+================================================================================
+
+MASt3R-SLAM requires:
+- NVIDIA GPU with CUDA support (11.8, 12.1, or 12.4)
+- Tested on RTX 4090 (24GB VRAM)
+- PyTorch 2.5.1 with CUDA support
+- Python 3.11
+
+NOTE: macOS does NOT support CUDA. You need a Linux/Windows machine with an
+NVIDIA GPU, a Jetson board, or cloud GPU access.
+
+================================================================================
+OPTION 1: NVIDIA JETSON (Orin/Xavier)
+================================================================================
+
+Jetson boards have NVIDIA GPUs with CUDA support.
+
+Considerations:
+- Jetson Orin supports CUDA 11.4/12.x depending on JetPack version
+- Limited VRAM (8-64GB depending on model)
+- May need to optimize batch sizes for memory constraints
+- Check JetPack version compatibility with PyTorch 2.5.1
+
+================================================================================
+OPTION 2: DESKTOP WITH NVIDIA GPU
+================================================================================
+
+Recommended: RTX 3080 or better (RTX 4090 is reference hardware)
+
+Step 1: Create Conda Environment
+--------------------------------
+conda create -n mast3r-slam python=3.11
+conda activate mast3r-slam
+
+Step 2: Install PyTorch with CUDA
+---------------------------------
+For CUDA 11.8:
+pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu118
+
+For CUDA 12.1:
+pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu121
+
+For CUDA 12.4:
+pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu124
+
+Step 3: Clone MASt3R-SLAM
+-------------------------
+git clone --recursive https://github.com/rmurai0610/MASt3R-SLAM.git
+cd MASt3R-SLAM
+
+Step 4: Install Dependencies
+----------------------------
+pip install -e thirdparty/mast3r
+pip install -e thirdparty/in3d
+pip install -e . --no-build-isolation
+
+Step 5: Optional - Faster MP4 Loading
+-------------------------------------
+pip install torchcodec==0.1
+
+Step 6: Download Model Checkpoints
+----------------------------------
+Required checkpoints:
+- MASt3R ViTLarge BaseDecoder (metric version)
+- MASt3R retrieval training-free checkpoint
+- MASt3R retrieval codebook file
+
+(Check repository README for download links/scripts)
+
+================================================================================
+OPTION 3: CLOUD GPU
+================================================================================
+
+Services with NVIDIA GPUs:
+- Google Colab (free tier has limited GPU)
+- Lambda Labs
+- Vast.ai
+- RunPod
+- AWS EC2 (p3/p4 instances)
+- Google Cloud (A100/V100 instances)
+
+================================================================================
+RUNNING MASt3R-SLAM
+================================================================================
+
+With video file:
+python main.py --dataset /path/to/video.mp4 --config config/base.yaml
+
+With image folder:
+python main.py --dataset /path/to/frames/ --config config/base.yaml
+
+With RealSense camera:
+python main.py --dataset realsense --config config/base.yaml
+
+With custom camera calibration:
+python main.py --dataset /path/to/data --config config/base.yaml --calib config/intrinsics.yaml
+
+================================================================================
+SUPPORTED INPUT SOURCES
+================================================================================
+
+- Video files (MP4 format)
+- Image sequences (folders containing RGB images)
+- Live cameras (RealSense camera integration)
+- Pre-downloaded datasets: TUM-RGBD, 7-Scenes, EuRoC, ETH3D SLAM
+
+================================================================================
+CONFIGURATION FILES
+================================================================================
+
+- config/base.yaml        : Standard configuration
+- config/calib.yaml       : Calibrated camera setup
+- config/intrinsics.yaml  : Custom camera intrinsic parameters
+
+================================================================================
+WINDOWS SUBSYSTEM FOR LINUX (WSL) NOTE
+================================================================================
+
+If using WSL, checkout to the 'windows' branch to avoid multiprocessing
+shared memory issues:
+
+git checkout windows
+
+================================================================================
+INTEGRATION WITH JETSONCV TELLO DRONE PROJECT
+================================================================================
+
+The JetsonCV project has placeholder files for SLAM integration:
+- jetsoncv/sdk/control/slam_controller.py
+- apps/slam_app.py
+
+Integration approaches:
+
+1. OFFLINE PROCESSING
+   - Record Tello video stream to MP4
+   - Process with MASt3R-SLAM on GPU machine
+   - Use trajectory output for analysis
+
+2. REAL-TIME (requires local GPU)
+   - Stream Tello frames via FrameHub
+   - Forward to MASt3R-SLAM pipeline
+   - Use pose estimates for drone control
+
+3. NETWORK STREAMING
+   - Stream frames from Tello to GPU server
+   - Run SLAM on server
+   - Send pose estimates back to drone controller
+
+================================================================================
